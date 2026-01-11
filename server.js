@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express= require("express")
 const connectDb= require("./config/db.js")
 const user =require("./routes/user.js")
+const cors= require("cors")
 
 const app= express();
 
@@ -13,7 +15,7 @@ app.get("/test",(req,res)=>{
 
 app.use("/api/user",user)
 
-// connectDb();
+connectDb();
 app.listen(3000,()=>{
     console.log("Server listening on port 3000");
 })

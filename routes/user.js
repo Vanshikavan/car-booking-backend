@@ -1,21 +1,61 @@
-const express= require("express");
+const express = require("express");
+const bcrypt= require("bcrypt")
+const User = require("../models/users")
 
-const router= express.Router();
+const router = express.Router();
 
-router.post("/signup",async(req,res)=>{
-    try{
-
-    }catch(err){
-        console.log(err);
+router.post("/signup", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({
+        msg: "Enter values for all the fields.",
+      });
     }
-})
-
-router.post("/login",async(req,res)=>{
-    try{
-
-    }catch(err){
-        console.log(err);
+    const exist =await User.findOne({ username });
+    if (!exist) {
+        const hashedpassword=await bcrypt.hash(password,10);
+      const user = await User.create({
+        username,
+        password:hashedpassword,
+      });
+    } else {
+      return res.status(409).json({
+        msg: "Username not unique",
+      });
     }
-})
+    return res.status(201).json({
+      success: true,
+      data: {
+        message: "User created successfully",
+        userId:user._id,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+        msg:"User not created"
+    })
+  }
+});
 
-module.exports(router)
+router.post("/login", async (req, res) => {
+  try {
+    const {username,password}=req.body;
+    const user=User.findOne({username});
+    if(!user){
+        return res.status(401).json({
+            msg:"user does not exist"
+        })
+    }
+    const validPassword= await bcrypt.compare(password,user.password);
+    if(!validPassword){
+        return res.status(401).json({
+            msg:"incorrect password",
+        })
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+module.exports=router;
