@@ -16,7 +16,6 @@ app.get("/test",(req,res)=>{
 
 app.use("/api/user",user)
 app.use("/api/book",book)
-
 connectDb();
 app.listen(3000,()=>{
     console.log("Server listening on port 3000");

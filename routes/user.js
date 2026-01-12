@@ -6,19 +6,22 @@ const router = express.Router();
 
 router.post("/signup", async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password,role } = req.body;
     if (!username || !password) {
       return res.status(400).json({
         msg: "Enter values for all the fields.",
       });
     }
     const exist = await User.findOne({ username });
+    let user;
     if (!exist) {
       const hashedpassword = await bcrypt.hash(password, 10);
-      const user = await User.create({
+      user = await User.create({
         username,
         password: hashedpassword,
+        role
       });
+
     } else {
       return res.status(409).json({
         msg: "Username not unique",
@@ -61,6 +64,7 @@ router.post("/login", async (req, res) => {
     const token= jwt.sign({
         userId:user._id,
         username,
+        role:user.role
     },process.env.SECRET)
     res.status(200).json({
       success: true,

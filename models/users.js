@@ -10,6 +10,12 @@ const userSchema= new mongoose.Schema({
         type: String,
         required: true,
         minlength: 3
+    },
+    role:{
+        type:String,
+        required: true,
+        enum: ["customer","owner"],
+        default: "customer"
     }
 },
 {

@@ -22,7 +22,11 @@ const bookingSchema = new mongoose.Schema({
     enum:["booked","completed","cancelled"],
     default:"booked",
     required:true,
+  },
+  totalCost:{
+    type:Number
   }
+
 },
 {
     timestamps: true

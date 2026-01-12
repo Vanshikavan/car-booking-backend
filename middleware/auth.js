@@ -23,6 +23,7 @@ function auth(req, res, next) {
     req.user = {
       userId: verify.userId,
       username: verify.username,
+      role:verify.role
     };
 
     next();
