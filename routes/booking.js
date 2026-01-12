@@ -7,6 +7,11 @@ const Booking = require("../models/bookings");
 bookingRouter.post("/registerbooking", auth, async (req, res) => {
   try {
     const { carName, days, rentPerDay } = req.body;
+    if(req.user.role!=="customer"){
+      return res.status(400).json({
+        msg:"Only customers can book"
+      })
+    }
     const Days = Number(days);
     const RentPerDay = Number(rentPerDay);
     if (Days > 365 || RentPerDay > 2000) {
@@ -144,7 +149,14 @@ bookingRouter.put("/booking/:id", auth, async (req, res) => {
       });
     }
     const { id } = req.params;
-
+    const currentUser=await Booking.findById(id);
+    const userid=currentUser.user;
+    const exist=User.findById(userid);
+    if(!exist){
+      return res.status(403).json({
+        msg: "Booking does not belong to user",
+      });
+    }
     const booking = await Booking.findByIdAndUpdate(
       id,
       { carName, days, rentPerDay, status },
@@ -153,13 +165,6 @@ bookingRouter.put("/booking/:id", auth, async (req, res) => {
     if (!booking) {
       return res.status(404).json({
         msg: "Booking not found",
-      });
-    }
-
-    if (String(booking.user) !== String(req.user.userId)
-) {
-      return res.status(403).json({
-        msg: "Booking does not belong to user",
       });
     }
 
